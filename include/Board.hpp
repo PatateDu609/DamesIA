@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include "Man.hpp"
+#include "Piece.hpp"
 
 class Board : public sf::Drawable, public sf::Transformable
 {
@@ -20,7 +20,7 @@ public:
 
 	static Board *getInstance(int size, float radius);
 	static void resetInstance();
-	[[nodiscard]] const Man* getCell(int x, int y) const;
+	[[nodiscard]] const Piece* getCell(int x, int y) const;
 	float getCellSize() const;
 
 	void click(sf::Vector2i pos);
@@ -32,11 +32,11 @@ private:
 	void drawReachable(sf::RenderTarget& target, sf::RenderStates states) const;
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-	std::vector<std::vector<Man *>> _cells{};
+	std::vector<std::vector<Piece *>> _cells{};
 	static Board *instance;
 	float _ratio;
 	int _size;
-	Man *_selected;
+	Piece *_selected;
 };
 
 #endif //DAMES_BOARD_HPP

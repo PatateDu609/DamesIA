@@ -23,7 +23,9 @@ RingShape::RingShape(int sides, float radius, float outline) : _vertices(sf::Qua
 	oldInX = radius - outline;
 	oldInY = -outline;
 
-	for (int i = 0, j = 0; i < sides * 8; i += 4, j++) {
+	for (int i = 0, j = 0; i < sides * 8; i += 4, j++)
+	{
+		double angle = 2. * PI * ((j + 1) % sides) / sides;
 		x = oldX;
 		y = oldY;
 		outX = oldOutX;
@@ -35,8 +37,8 @@ RingShape::RingShape(int sides, float radius, float outline) : _vertices(sf::Qua
 		_vertices[i].position = sf::Vector2f(x, y);
 		_vertices[i].color = full;
 
-		oldX = radius * std::cos(2.0 * PI * ((j + 1) % sides) / sides);
-		oldY = radius * std::sin(2.0 * PI * ((j + 1) % sides) / sides);
+		oldX = radius * std::cos(angle);
+		oldY = radius * std::sin(angle);
 		_vertices[i + 1].position = sf::Vector2f(oldX, oldY);
 		_vertices[i + 1].color = full;
 
@@ -53,8 +55,8 @@ RingShape::RingShape(int sides, float radius, float outline) : _vertices(sf::Qua
 		_vertices[i].position = sf::Vector2f(x, y);
 		_vertices[i].color = full;
 
-		oldX = radius * std::cos(2.0 * PI * ((j + 1) % sides) / sides);
-		oldY = radius * std::sin(2.0 * PI * ((j + 1) % sides) / sides);
+		oldX = radius * std::cos(angle);
+		oldY = radius * std::sin(angle);
 		_vertices[i + 1].position = sf::Vector2f(oldX, oldY);
 		_vertices[i + 1].color = full;
 

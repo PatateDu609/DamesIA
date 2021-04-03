@@ -12,15 +12,15 @@ Board *Board::instance = nullptr;
 Board::Board(int size, float ratio) : _cells{}, _size(size), _ratio(ratio), _selected(
 		nullptr)
 {
-	Man::Color colors[] = {Man::BLACK, Man::WHITE};
+	Piece::Color colors[] = {Piece::BLACK, Piece::WHITE};
 
 	for (int i = 0; i < 10; i++) {
 		_cells.emplace_back();
 		for (int j = 0; j < 10; j++) {
 			if ((j + (i % 2)) % 2 || (3 < i && i < 6))
-				_cells[i].push_back(NULL);
+				_cells[i].push_back(nullptr);
 			else
-				_cells[i].push_back(new Man(colors[i >= 6], this, std::array<int, 2>{j, i}));
+				_cells[i].push_back(new Piece(colors[i >= 6], this, std::array<int, 2>{j, i}));
 		}
 	}
 }
@@ -45,7 +45,7 @@ void Board::resetInstance()
 	instance = nullptr;
 }
 
-const Man *Board::getCell(int x, int y) const
+const Piece *Board::getCell(int x, int y) const
 {
 	return _cells[y][x];
 }
@@ -111,7 +111,7 @@ void Board::drawReachable(sf::RenderTarget &target, sf::RenderStates states) con
 	shading.setPosition(_selected->getCoord()[0] * getCellSize() + offsetOutline,
 	                    _selected->getCoord()[1] * getCellSize() + offsetOutline);
 
-	if (_selected->getColor() == Man::BLACK)
+	if (_selected->getColor() == Piece::BLACK)
 		shading.setFullColor(Params::color[C_B_OUTLINE]);
 	else
 		shading.setFullColor(Params::color[C_W_OUTLINE]);

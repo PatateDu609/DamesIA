@@ -21,3 +21,5 @@ std::map<RatioType, float> Params::ratio = {
 };
 
 int Params::size = 1024;
+
+std::string Params::crown_path = "";

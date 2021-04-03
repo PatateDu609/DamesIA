@@ -30,6 +30,7 @@ struct Params
 	static std::map<ColorType, sf::Color> color;
 	static std::map<RatioType, float> ratio;
 	static int size;
+	static std::string crown_path;
 };
 
 #endif //DAMES_PARAMS_HPP
