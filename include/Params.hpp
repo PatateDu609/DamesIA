@@ -7,6 +7,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#define ELAGAGE 0
+
 enum ColorType
 {
 	C_BG_BLACK,

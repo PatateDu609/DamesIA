@@ -17,13 +17,13 @@ int main()
 	switch (Params::difficulty)
 	{
 		case EASY:
-			Params::depth = 2;
+			Params::depth = 15;
 			break;
 		case MEDIUM:
-			Params::depth = 5;
+			Params::depth = 25;
 			break;
 		case HARD:
-			Params::depth = 10;
+			Params::depth = 50;
 	}
 
 	while (window.isOpen())

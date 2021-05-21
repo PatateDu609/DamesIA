@@ -72,8 +72,8 @@ void Board::remove_captured(const Coord &next)
 	for (decltype(capture.paths)::size_type i = 0; i < capture.paths.size(); i++)
 	{
 		if ((capture.paths[i][0] != next && !_selected->isKing()) ||
-			(std::find(capture.paths[i].begin(), capture.paths[i].end(), next) == capture.paths[i].end()
-			&& _selected->isKing()))
+		    (std::find(capture.paths[i].begin(), capture.paths[i].end(), next) == capture.paths[i].end() &&
+		     capture.targets.size() == 1 && _selected->isKing()))
 		{
 			capture.paths.erase(capture.paths.begin() + (long long) i);
 			capture.targets.erase(capture.targets.begin() + (long long) i);
@@ -388,7 +388,6 @@ void Board::best_move()
 	int alpha = std::numeric_limits<int>::min();
 	int beta = std::numeric_limits<int>::max();
 
-//	std::cerr << "The AI is sleeping (it's just playing too fast, it needed a debuff)" << std::endl;
 //	Sleep(1000);
 
 	for (auto &possibility : possibilities)
@@ -418,6 +417,8 @@ void Board::best_move()
 	}
 	turn++;
 }
+
+#if defined(ELAGAGE) && ELAGAGE == 1
 
 int Board::minmax(const State &state, Move &move, int depth, int currentTurn, bool max, int alpha, int beta)
 {
@@ -478,6 +479,55 @@ int Board::minmax(const State &state, Move &move, int depth, int currentTurn, bo
 	return val;
 }
 
+#else
+
+int Board::minmax(const State &state, Move &move, int depth, int currentTurn, bool max, int alpha, int beta)
+{
+	if (depth < 0 || checkEnd(state) != -1)
+		return evaluation(state, currentTurn, max);
+
+	int val;
+	Move m{};
+	auto states = getStates(state, move.start);
+	Coord old = move.start;
+	if (!max)
+	{
+		val = std::numeric_limits<int>::max();
+
+		for (const auto &currentState : states)
+		{
+			m = currentState.first;
+			old = m.start;
+			m.start = m.arrive;
+			val = std::min(val, minmax(currentState.second, m, depth - 1,
+			                           currentTurn + 1, !max, alpha, beta));
+		}
+	}
+	else
+	{
+		val = std::numeric_limits<int>::min();
+
+		for (const auto &currentState : states)
+		{
+			m = currentState.first;
+			old = m.start;
+			m.start = m.arrive;
+			val = std::max(val, minmax(currentState.second, m, depth - 1,
+			                           currentTurn + 1, !max, alpha, beta));
+		}
+
+	}
+
+	for (auto &stateToFree : states)
+		free(stateToFree.second);
+
+	m.start = old;
+	move = m;
+	return val;
+}
+
+#endif
+
 int Board::evaluation(const std::vector<std::vector<Piece *>> &state, int currentTurn, bool max)
 {
 	int end = checkEnd(state);
@@ -512,12 +562,13 @@ std::vector<std::pair<Board::Move, Board::State>> Board::getStates(const State &
 	std::vector<std::pair<Move, State>> states;
 
 	auto cell = state[start[1]][start[0]];
-
 	if (!cell)
 		return states;
+
 	auto reachable = cell->getReachable();
 	if (reachable.empty())
 		return states;
+
 	auto currentCapture = reachable[0].second;
 	Move move{};
 
