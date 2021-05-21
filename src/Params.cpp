@@ -26,6 +26,6 @@ int Params::size = 1024;
 
 const char *Params::crown_path = "crown.png";
 
-Difficulty Params::difficulty = EASY;
+Difficulty Params::difficulty = HARD;
 int Params::depth = 6;
-bool Params::enableAI = true;
+bool Params::enableAI = false;

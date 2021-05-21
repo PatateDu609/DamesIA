@@ -14,6 +14,17 @@ int main()
 
 	if (Params::enableAI)
 		board->setAI(Piece::BLACK);
+	switch (Params::difficulty)
+	{
+		case EASY:
+			Params::depth = 2;
+			break;
+		case MEDIUM:
+			Params::depth = 5;
+			break;
+		case HARD:
+			Params::depth = 10;
+	}
 
 	while (window.isOpen())
 	{
@@ -26,11 +37,11 @@ int main()
 				board->click(sf::Mouse::getPosition(window));
 		}
 
-		board->update();
-
 		window.clear(sf::Color(60, 60, 60));
 		window.draw(*board);
 		window.display();
+
+		board->update();
 	}
 
 	Board::resetInstance();

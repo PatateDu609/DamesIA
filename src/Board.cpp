@@ -9,7 +9,7 @@
 
 Board *Board::instance = nullptr;
 
-Board::Board(int size, float ratio) : _cells{}, _size(size), _ratio(ratio), _selected(nullptr)
+Board::Board(int size, float ratio) : _cells{}, _size(size), _ratio(ratio), _selected(nullptr), ai()
 {
 	Piece::Color colors[] = {Piece::BLACK, Piece::WHITE};
 
@@ -22,22 +22,11 @@ Board::Board(int size, float ratio) : _cells{}, _size(size), _ratio(ratio), _sel
 				_cells[i].push_back(nullptr);
 			else
 			{
-//				_cells[i].push_back(nullptr);
 				_cells[i].push_back(new Piece(colors[i >= 6], this, Coord{j, i}));
 				pieces[_cells[i].back()->getColor()]++;
 			}
 		}
 	}
-//	_cells[1][1] = new Piece(colors[1], this, Coord{1, 1});
-//	_cells[4][4] = new Piece(colors[0], this, Coord{4, 4});
-//	_cells[7][7] = new Piece(colors[0], this, Coord{7, 7});
-//	_cells[1][1] = new Piece(colors[1], this, Coord{1, 1});
-
-//	_cells[4][8] = new Piece(colors[0], this, Coord{8, 4});
-//	_cells[3][5] = new Piece(colors[0], this, Coord{5, 3});
-//	_cells[4][6] = new Piece(colors[0], this, Coord{6, 4});
-//	_cells[7][3] = new Piece(colors[0], this, Coord{3, 7});
-//	_cells[7][5] = new Piece(colors[0], this, Coord{5, 7});
 }
 
 Board::~Board()
@@ -82,7 +71,9 @@ void Board::remove_captured(const Coord &next)
 
 	for (decltype(capture.paths)::size_type i = 0; i < capture.paths.size(); i++)
 	{
-		if (next != capture.paths[i][0])
+		if ((capture.paths[i][0] != next && !_selected->isKing()) ||
+			(std::find(capture.paths[i].begin(), capture.paths[i].end(), next) == capture.paths[i].end()
+			&& _selected->isKing()))
 		{
 			capture.paths.erase(capture.paths.begin() + (long long) i);
 			capture.targets.erase(capture.targets.begin() + (long long) i);
@@ -354,6 +345,7 @@ void Board::checkPossibilities()
 		for (int x = 0; x < 10; x++)
 		{
 			Piece *piece = _cells[y][x];
+			bool type = piece && piece->isKing();
 			if (!piece || piece->getColor() != (turn + 1) % 2)
 				continue;
 
@@ -396,20 +388,19 @@ void Board::best_move()
 	int alpha = std::numeric_limits<int>::min();
 	int beta = std::numeric_limits<int>::max();
 
-	Sleep(200);
+//	std::cerr << "The AI is sleeping (it's just playing too fast, it needed a debuff)" << std::endl;
+//	Sleep(1000);
 
-	for (size_t i = 0; i < possibilities.size(); i++)
+	for (auto &possibility : possibilities)
 	{
-		const auto& possibility = possibilities[i];
 		move.start = possibility->getCoord();
 		auto states = getStates(copy, move.start);
 
-		for (size_t j = 0; j < states.size(); j++)
+		for (auto &state : states)
 		{
-			auto& state = states[j];
 			Move tmp = state.first;
 			tmp.start = tmp.arrive;
-			val = std::max(val, minmax(state.second, tmp, Params::depth, turn, true, alpha, beta));
+			val = std::max(val, minmax(state.second, tmp, Params::depth, turn + 1, true, alpha, beta));
 			if (val >= beta)
 			{
 				move = state.first;
@@ -478,6 +469,10 @@ int Board::minmax(const State &state, Move &move, int depth, int currentTurn, bo
 		}
 
 	}
+
+	for (auto &stateToFree : states)
+		free(stateToFree.second);
+
 	m.start = old;
 	move = m;
 	return val;
@@ -512,7 +507,7 @@ int Board::evaluation(const std::vector<std::vector<Piece *>> &state, int curren
 	return (piecesWhite - piecesBlack) * signum;
 }
 
-std::vector<std::pair<Board::Move, Board::State>> Board::getStates(const State &state, Coord start) const
+std::vector<std::pair<Board::Move, Board::State>> Board::getStates(const State &state, Coord start)
 {
 	std::vector<std::pair<Move, State>> states;
 
@@ -565,9 +560,9 @@ void Board::applyMovement(State &state, Move move)
 
 void Board::applyCapture(const std::vector<Coord> &targets)
 {
-	for (const auto & targetCoord : targets)
+	for (const auto &targetCoord : targets)
 	{
-		Piece *& target = _cells[targetCoord[1]][targetCoord[0]];
+		Piece *&target = _cells[targetCoord[1]][targetCoord[0]];
 
 		delete target;
 		target = nullptr;

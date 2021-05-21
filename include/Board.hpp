@@ -11,6 +11,7 @@
 #include <map>
 #include <limits>
 #include <windows.h>
+#include <algorithm>
 
 class Board : public sf::Drawable, public sf::Transformable
 {
@@ -56,7 +57,7 @@ private:
 	void best_move();
 	int minmax(const State &state, Move &move, int depth, int currentTurn, bool max, int alpha, int beta);
 	int evaluation(const std::vector<std::vector<Piece *>> &state, int currentTurn, bool max);
-	std::vector<std::pair<Board::Move, Board::State>> getStates(const State &state, Coord start) const;
+	static std::vector<std::pair<Board::Move, Board::State>> getStates(const State &state, Coord start) ;
 	static void applyMovement(State &state, Move move) ;
 	static State duplicate(const State& state);
 	static void free(State& state);

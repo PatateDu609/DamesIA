@@ -48,6 +48,8 @@ public:
 	bool move(const Coord &coord);
 
 	void setBoard(const std::vector<std::vector<Piece *>> &vector);
+	void setKing(bool king);
+
 private:
 	Color _color;
 	Board *_board;

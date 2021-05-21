@@ -115,7 +115,7 @@ void Piece::king_moves(std::vector<std::pair<Coord, Piece::Capture>> &reachable,
 		if (start[0] < 0 || start[0] > 9 ||
 		    start[1] < 0 || start[1] > 9)
 			continue;
-		if (getCell(_coord))
+		if (getCell(start))
 			continue;
 		std::vector<Coord> expanded = expand_move(start, dir);
 
@@ -167,6 +167,7 @@ std::vector<std::pair<Coord, Piece::Capture>> Piece::getReachable()
 
 	Capture capture{};
 
+	bool isKing = _isKing;
 	if (check_capture(_coord, dirs, capture))
 	{
 		reachable.clear();
@@ -352,4 +353,9 @@ Piece *Piece::getCell(int x, int y)
 void Piece::setBoard(const Board::State &b)
 {
 	board = b;
+}
+
+void Piece::setKing(bool king)
+{
+	_isKing = king;
 }
