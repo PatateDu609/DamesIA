@@ -17,7 +17,7 @@ public:
 	void setFullColor(sf::Color color);
 
 private:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
 	sf::VertexArray _vertices;
 };
